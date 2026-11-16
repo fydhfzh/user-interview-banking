@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kuis persiapan interview aplikasi perbankan</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f6;--card:#fff;--ink:#14212b;--mute:#58656e;--line:#d5dbde;--acc:#0f6e56;--accbg:#e1f5ee;--on:#fff;--bad:#a32d2d;--badbg:#fcebeb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171b;--card:#182026;--ink:#e8ecee;--mute:#9aa6ad;--line:#2c363c;--acc:#5dcaa5;--accbg:#123a30;--on:#06231b;--bad:#f09595;--badbg:#3a1b1b}}
+:root[data-theme="dark"]{--bg:#10171b;--card:#182026;--ink:#e8ecee;--mute:#9aa6ad;--line:#2c363c;--acc:#5dcaa5;--accbg:#123a30;--on:#06231b;--bad:#f09595;--badbg:#3a1b1b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:32px 20px 56px}
+h1{font-size:28px;line-height:1.25;font-weight:500;margin:0 0 8px}
+h2{font-size:20px;font-weight:500;margin:0 0 12px;line-height:1.4}
+p{margin:0 0 16px}
+.mute{color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 24px}
+.chip{background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--on)}
+.btn{background:var(--acc);color:var(--on);border:0;border-radius:8px;padding:10px 20px;font-weight:500}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px}
+.bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .25s}
+.meta{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--mute);margin-bottom:16px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.opt:hover:not(:disabled){border-color:var(--acc)}
+.opt:disabled{cursor:default;color:inherit}
+.opt.ok{background:var(--accbg);border-color:var(--acc)}
+.opt.no{background:var(--badbg);border-color:var(--bad)}
+.fb{margin-top:16px;padding:14px 16px;border-radius:8px;background:var(--bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0}
+.fb.no{border-left-color:var(--bad)}
+.fb b{font-weight:500;display:block;margin-bottom:4px}
+.score{font-size:44px;font-weight:500;line-height:1.1;margin:4px 0 8px}
+.tp{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.wr{padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+.wr span{display:block;color:var(--acc)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<section id="home">
+  <h1>Kuis persiapan interview aplikasi perbankan</h1>
+  <p class="mute">20 soal dari materi slide “Persiapan Interview User” dan ilustrasi arsitektur sistem perbankan. Pilih topik, jawab, lalu baca penjelasan di setiap soal.</p>
+  <div class="chips" id="chips" role="group" aria-label="Pilih topik"></div>
+  <button class="btn" id="go">Mulai kuis</button>
+</section>
+
+<section id="quiz" hidden>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="meta"><span id="cnt"></span><span id="tag"></span></div>
+  <div class="card">
+    <h2 id="qt"></h2>
+    <div id="opts"></div>
+    <div class="fb" id="fb" hidden><b id="fbt"></b><span id="fbx"></span></div>
+    <div class="row" id="nxtrow" hidden><button class="btn" id="nxt"></button></div>
+  </div>
+</section>
+
+<section id="res" hidden>
+  <div class="card">
+    <p class="mute" style="margin:0">Hasil kamu</p>
+    <div class="score" id="sc"></div>
+    <p id="msg"></p>
+    <h2>Per topik</h2>
+    <div id="tps"></div>
+    <div id="wrwrap" hidden><h2 style="margin-top:24px">Perlu diulang</h2><div id="wrs"></div></div>
+    <div class="row">
+      <button class="btn" id="again" hidden>Ulangi soal yang salah</button>
+      <button class="btn ghost" id="restart">Kembali ke awal</button>
+    </div>
+  </div>
+</section>
+</main>
+<script>
+const T=["Arsitektur","Pengembangan","Keamanan & integritas","Pengujian & rilis"];
+const Q=[
+[0,"Slide 5","Apa yang dimaksud dengan core banking?","Sistem inti yang mencatat rekening, transaksi, saldo, dan akuntansi bank","Aplikasi mobile yang dipakai nasabah untuk bertransaksi","Jaringan switching antarbank seperti BI-FAST","Data warehouse untuk laporan regulator","Core banking adalah pusat pencatatan semua transaksi dan saldo nasabah. Aplikasi mobile adalah channel, bukan core."],
+[0,"Slide 4 dan ilustrasi lapisan","Bagaimana urutan alur arsitektur sistem perbankan yang benar?","Channel → integrasi → core → data, dengan keamanan di semua lapisan","Core → channel → data → integrasi","Data → core → integrasi → channel","Channel → core → integrasi, dengan keamanan hanya di infrastruktur","Nasabah masuk lewat channel, diteruskan lewat integrasi ke core, lalu data tersimpan. Keamanan menyentuh setiap lapisan."],
+[0,"Slide 5","Modul core banking mana yang mencatat jurnal akuntansi dan neraca?","General Ledger","CIF","Deposito","Teller & transaksi","General Ledger menyimpan jurnal dan neraca. CIF menyimpan data nasabah tunggal."],
+[0,"Ilustrasi lapisan integrasi","Apa fungsi utama API gateway pada lapisan integrasi?","Routing permintaan, rate limiting, dan versioning API","Menyimpan saldo nasabah","Menghitung bunga deposito","Menggantikan firewall sepenuhnya","Gateway adalah pintu masuk semua permintaan. Saldo tetap di core banking, dan WAF atau firewall tetap dibutuhkan."],
+[0,"Ilustrasi DR","Dalam desain pemulihan bencana, apa arti RPO (Recovery Point Objective)?","Jumlah data yang boleh hilang saat terjadi bencana","Lama layanan boleh mati sebelum pulih","Jumlah server di data center DR","Jadwal rilis aplikasi","RPO menyangkut data yang boleh hilang, sedangkan RTO menyangkut lama pemulihan. Untuk core banking, RPO mendekati nol."],
+[0,"Ilustrasi alur transfer","Mengapa notifikasi SMS atau push dikirim secara asinkron lewat message broker?","Keterlambatan notifikasi tidak menahan transaksi yang sudah tercatat","Agar saldo tidak perlu dicatat di ledger","Agar autentikasi tidak diperlukan","Agar transaksi bisa dibatalkan setelah sukses","Notifikasi dikirim setelah transaksi tercatat, jadi gangguan pengiriman tidak memblokir transaksi."],
+[1,"Slide 6","Metode pengembangan mana yang cocok untuk core banking dan regulasi ketat?","Waterfall, karena berurutan dan dokumentasinya kuat","Agile/Scrum murni, karena paling cepat","Langsung coding tanpa metode","Hanya prototyping","Waterfall cocok untuk core banking, Agile untuk mobile dan fitur digital. Di bank sering dipakai hybrid."],
+[1,"Slide 7","Dokumen mana yang memuat kebutuhan teknis dan non-fungsional seperti kinerja, keamanan, dan integrasi?","SRS","BRD","FSD","Release note","BRD adalah kebutuhan bisnis, FSD fungsi sistem, dan SRS spesifikasi teknis serta non-fungsional."],
+[1,"Slide 7","Apa isi FSD (Functional Specification Document)?","Alur, aturan, layar, dan validasi tentang bagaimana sistem bekerja","Tujuan bisnis dan alasan proyek","Hasil sign-off UAT","Jadwal go-live","FSD menjelaskan bagaimana fungsi sistem bekerja. Tujuan bisnis ada di BRD."],
+[1,"Slide 7","Apa yang dimaksud dengan traceability pada requirement?","Setiap requirement bisa ditelusuri sampai ke test case","Setiap requirement dicetak rangkap","Requirement hanya ditulis oleh developer","Requirement tidak boleh berubah","Traceability memastikan tidak ada requirement yang terlewat saat desain, pengembangan, dan pengujian."],
+[1,"Slide 8","Alat desain mana yang menggambarkan entitas dan relasi tabel, misalnya Nasabah 1—N Rekening 1—N Transaksi?","ERD","Flowchart","Sequence diagram","Dokumen BRD","ERD memodelkan entitas dan relasi data. Flowchart menggambarkan alur proses dan keputusan."],
+[2,"Slide 10","Debit rekening pengirim berhasil, tetapi kredit ke rekening penerima gagal. Prinsip ACID mana yang bekerja?","Atomicity: seluruh transaksi dibatalkan (rollback)","Isolation: transaksi lain ikut dibatalkan","Durability: saldo pengirim tetap berkurang","Consistency: kegagalan diabaikan","Atomicity berarti semua berhasil atau batal semua, jadi debit harus dikembalikan."],
+[2,"Slide 15 dan ilustrasi transfer","Pengguna menekan tombol transfer dua kali karena koneksi lambat. Mekanisme apa yang mencegah saldo terpotong dua kali?","Idempotency key (ID transaksi unik)","Masking data","Maker-checker","Regression test","Setiap transaksi punya ID unik, sehingga permintaan ganda dengan ID yang sama hanya diproses sekali."],
+[2,"Slide 10","Apa itu prinsip maker-checker?","Satu orang menginput, orang lain memeriksa dan menyetujui","Dua server mereplikasi data","Dua tahap enkripsi","Developer menguji kodenya sendiri","Maker-checker adalah kontrol internal agar tidak ada satu orang yang bisa memproses transaksi sendirian."],
+[2,"Ilustrasi alur transfer","Mengapa pemeriksaan fraud dilakukan sebelum posting ke core banking?","Skor risiko dihitung sebelum dana benar-benar dipindahkan","Agar notifikasi lebih cepat","Agar ledger tidak perlu dicatat","Agar OTP tidak diperlukan","Dana yang sudah berpindah lebih sulit ditarik kembali, jadi risiko dinilai lebih dulu."],
+[3,"Slide 11","Apa perbedaan utama SIT dan UAT?","SIT menguji integrasi teknis antar sistem; UAT diuji user bisnis untuk memvalidasi kebutuhan","SIT oleh user bisnis; UAT oleh developer","Keduanya sama, salah satunya boleh dilewati","SIT hanya menguji satu fungsi","SIT bersifat teknis dan antar sistem. UAT bersifat bisnis dan menghasilkan sign-off sebelum go-live."],
+[3,"Slide 11","Mengapa regression test penting?","Memastikan perubahan baru tidak merusak fungsi yang sudah berjalan","Menguji satu fungsi oleh developer","Mengumpulkan umpan balik pengguna","Menggantikan UAT","Setiap perubahan berpotensi merusak fitur lama, dan regression test menangkapnya."],
+[3,"Slide 12","Urutan alur change request yang benar adalah …","Ajukan CR → analisis → persetujuan (CAB) → implementasi → review","Implementasi → ajukan CR → persetujuan → review","Persetujuan → analisis → ajukan CR → implementasi","Analisis → implementasi → review → ajukan CR","Tidak ada perubahan tanpa persetujuan: dampak dan risiko dianalisis dulu, disetujui, baru diimplementasikan."],
+[3,"Slide 14","Siapa yang menganalisis akar masalah di tingkat application support (L2)?","Tim application support","Help desk, yang mencatat dan melakukan triase","Developer, yang memperbaiki kode","Nasabah","L1 adalah help desk (catat, triase), L2 application support (analisis), dan L3 developer (perbaikan kode)."],
+[3,"Slide 13","Apa fungsi smoke test setelah deployment?","Memeriksa fungsi utama masih berjalan sebelum go-live","Menguji seluruh fitur secara mendalam","Melatih pengguna","Menyusun dokumen BRD","Smoke test adalah pengecekan cepat atas fungsi utama sesudah deploy."]
+];
+const $=id=>document.getElementById(id);
+const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let sel=-1,run=[],n=0,log=[];
+function show(id){["home","quiz","res"].forEach(x=>$(x).hidden=x!==id);window.scrollTo(0,0)}
+function chips(){
+  const c=$("chips");c.textContent="";
+  [["Semua topik",-1,Q.length]].concat(T.map((t,i)=>[t,i,Q.filter(q=>q[0]===i).length])).forEach(([t,i,k])=>{
+    const b=document.createElement("button");b.className="chip";b.textContent=t+" ("+k+")";
+    b.setAttribute("aria-pressed",String(sel===i));
+    b.onclick=()=>{sel=i;chips()};c.appendChild(b);
+  });
+}
+function start(list){run=sh(list);n=0;log=[];show("quiz");ask()}
+function ask(){
+  const q=run[n];
+  $("prog").style.width=(n/run.length*100)+"%";
+  $("cnt").textContent="Soal "+(n+1)+" dari "+run.length;
+  $("tag").textContent=T[q[0]]+", "+q[1];
+  $("qt").textContent=q[2];
+  $("fb").hidden=true;$("nxtrow").hidden=true;
+  const o=$("opts");o.textContent="";
+  sh([[q[3],1],[q[4],0],[q[5],0],[q[6],0]]).forEach(([t,ok])=>{
+    const b=document.createElement("button");b.className="opt";b.textContent=t;b.dataset.ok=ok;
+    b.onclick=()=>pick(b,q);o.appendChild(b);
+  });
+}
+function pick(b,q){
+  const ok=b.dataset.ok==="1";
+  document.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(x.dataset.ok==="1")x.classList.add("ok")});
+  if(!ok)b.classList.add("no");
+  log.push({q,ok});
+  $("fb").className="fb"+(ok?"":" no");$("fb").hidden=false;
+  $("fbt").textContent=ok?"Benar":"Belum tepat";
+  $("fbx").textContent=q[7];
+  $("nxt").textContent=n+1<run.length?"Soal berikutnya":"Lihat hasil";
+  $("nxtrow").hidden=false;$("nxt").focus();
+}
+function result(){
+  const good=log.filter(l=>l.ok).length,pct=Math.round(good/log.length*100);
+  $("sc").textContent=good+" / "+log.length;
+  $("msg").textContent=pct>=85?"Sangat siap. Pahamanmu sudah kuat, tinggal latihan menjelaskan dengan kalimat sendiri.":pct>=60?"Cukup baik. Ulangi soal yang salah, lalu buka slide yang disebut di penjelasan.":"Masih perlu pendalaman. Baca ulang slide terkait, lalu coba lagi dengan soal yang salah.";
+  const tp=$("tps");tp.textContent="";
+  T.forEach((t,i)=>{
+    const l=log.filter(x=>x.q[0]===i);if(!l.length)return;
+    const d=document.createElement("div");d.className="tp";
+    d.innerHTML="<span></span><span></span>";
+    d.children[0].textContent=t;d.children[1].textContent=l.filter(x=>x.ok).length+" / "+l.length;
+    tp.appendChild(d);
+  });
+  const bad=log.filter(l=>!l.ok),w=$("wrs");w.textContent="";
+  bad.forEach(l=>{
+    const d=document.createElement("div");d.className="wr";
+    d.innerHTML="<div></div><span></span>";
+    d.children[0].textContent=l.q[2];d.children[1].textContent="Jawaban benar: "+l.q[3];
+    w.appendChild(d);
+  });
+  $("wrwrap").hidden=!bad.length;$("again").hidden=!bad.length;
+  $("again").onclick=()=>start(bad.map(l=>l.q));
+  show("res");
+}
+$("go").onclick=()=>start(sel<0?Q:Q.filter(q=>q[0]===sel));
+$("nxt").onclick=()=>{n++;if(n<run.length)ask();else{$("prog").style.width="100%";result()}};
+$("restart").onclick=()=>{show("home")};
+chips();
+</script>
+</body>
+</html>
